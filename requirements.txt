@@ -1,0 +1,48 @@
+# Core Dependencies
+pandas==2.1.3
+numpy==1.24.3
+ta-lib==0.4.28
+scikit-learn==1.3.2
+requests==2.31.0
+beautifulsoup4==4.12.2
+lxml==4.9.3
+
+# Database
+sqlite3
+pymongo==4.6.0
+
+# Telegram
+python-telegram-bot==20.7
+
+# Scheduling
+APScheduler==3.10.4
+
+# Data APIs
+kiteconnect==4.2.0
+upstox-python-sdk==2.6.0
+
+# Technical Analysis
+yfinance==0.2.22
+nsepy==0.8
+
+# Visualization (optional)
+matplotlib==3.8.2
+plotly==5.17.0
+
+# Configuration
+python-dotenv==1.0.0
+
+# Logging
+colorlog==6.8.0
+
+# WebSocket for real-time data
+websocket-client==1.6.4
+
+# HTTP client
+aiohttp==3.9.1
+
+# Date utilities
+python-dateutil==2.8.2
+
+# Timezone handling
+pytz==2023.3
