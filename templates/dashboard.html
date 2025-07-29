@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 AI Trading Platform Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { 
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        .header h1 { 
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .status-item {
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border-left: 4px solid #007bff;
+        }
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+            gap: 25px; 
+            margin-bottom: 30px;
+        }
+        .card { 
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .card:hover { transform: translateY(-5px); }
+        .card h3 { 
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .metric { 
+            display: flex; 
+            justify-content: space-between; 
+            margin: 10px 0;
+            padding: 8px 0;
+        }
+        .metric.positive { color: #27ae60; }
+        .metric.negative { color: #e74c3c; }
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .btn.success { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+        .btn.danger { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .btn.warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .table th, .table td { 
+            padding: 12px; 
+            text-align: left; 
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        .table th { 
+            background: #f8f9fa; 
+            font-weight: 600;
+            color: #495057;
+        }
+        .table tr:hover { background: #f8f9fa; }
+        .signal-buy { color: #27ae60; font-weight: bold; }
+        .signal-sell { color: #e74c3c; font-weight: bold; }
+        .signal-hold { color: #f39c12; font-weight: bold; }
+        .loading { 
+            text-align: center; 
+            padding: 20px; 
+            color: #6c757d;
+            font-style: italic;
+        }
+        .chart-container { height: 400px; margin-top: 20px; }
+        .full-width { grid-column: 1 / -1; }
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        .connected { background: #27ae60; }
+        .disconnected { background: #e74c3c; }
+        @media (max-width: 768px) {
+            .container { padding: 10px; }
+            .grid { grid-template-columns: 1fr; }
+            .status-bar { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+    <div class="connection-status" id="connectionStatus">Connecting...</div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Trading Platform Dashboard</h1>
+            <div class="status-bar">
+                <div class="status-item">
+                    <strong>Status:</strong> <span id="systemStatus">Active</span>
+                </div>
+                <div class="status-item">
+                    <strong>Last Update:</strong> <span id="lastUpdate">--</span>
+                </div>
+                <div class="status-item">
+                    <strong>Active Symbols:</strong> <span id="activeSymbols">--</span>
+                </div>
+                <div>
+                    <button class="btn" onclick="requestUpdate('all')">🔄 Refresh All</button>
+                    <button class="btn success" onclick="generateSignals()">🎯 Generate Signals</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Portfolio Summary -->
+            <div class="card">
+                <h3>💼 Portfolio Summary</h3>
+                <div id="portfolioData" class="loading">Loading portfolio data...</div>
+            </div>
+
+            <!-- Live Quotes -->
+            <div class="card">
+                <h3>📊 Live Market Data</h3>
+                <div id="quotesData" class="loading">Loading market data...</div>
+            </div>
+
+            <!-- AI Signals -->
+            <div class="card">
+                <h3>🎯 AI Trading Signals</h3>
+                <div id="signalsData" class="loading">Loading AI signals...</div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="card">
+                <h3>📋 Recent Orders</h3>
+                <div id="ordersData" class="loading">Loading orders...</div>
+            </div>
+
+            <!-- Performance Chart -->
+            <div class="card full-width">
+                <h3>📈 Portfolio Performance</h3>
+                <div class="chart-container" id="performanceChart"></div>
+            </div>
+
+            <!-- Recent Trades -->
+            <div class="card full-width">
+                <h3>💰 Recent Trades</h3>
+                <div id="tradesData" class="loading">Loading trades data...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Socket.IO connection
+        const socket = io();
+        
+        // Connection status
+        const statusEl = document.getElementById('connectionStatus');
+        
+        socket.on('connect', function() {
+            statusEl.textContent = 'Connected';
+            statusEl.className = 'connection-status connected';
+            updateLastUpdate();
+        });
+        
+        socket.on('disconnect', function() {
+            statusEl.textContent = 'Disconnected';
+            statusEl.className = 'connection-status disconnected';
+        });
+
+        // Data update handlers
+        socket.on('portfolio_update', function(data) {
+            updatePortfolioData(data);
+        });
+
+        socket.on('quotes_update', function(data) {
+            updateQuotesData(data.quotes);
+        });
+
+        socket.on('signals_update', function(data) {
+            updateSignalsData(data.signals);
+        });
+
+        socket.on('orders_update', function(data) {
+            updateOrdersData(data.orders);
+            updateTradesData(data.trades);
+        });
+
+        // Update functions
+        function updatePortfolioData(data) {
+            const html = `
+                <div class="metric ${data.total_pnl >= 0 ? 'positive' : 'negative'}">
+                    <span>Portfolio Value:</span>
+                    <span>₹${formatNumber(data.portfolio_value)}</span>
+                </div>
+                <div class="metric">
+                    <span>Cash Balance:</span>
+                    <span>₹${formatNumber(data.cash_balance)}</span>
+                </div>
+                <div class="metric ${data.total_pnl >= 0 ? 'positive' : 'negative'}">
+                    <span>Total P&L:</span>
+                    <span>₹${formatNumber(data.total_pnl)}</span>
+                </div>
+                <div class="metric">
+                    <span>Positions:</span>
+                    <span>${data.total_positions}</span>
+                </div>
+                <div class="metric">
+                    <span>Win Rate:</span>
+                    <span>${data.win_rate.toFixed(1)}%</span>
+                </div>
+            `;
+            document.getElementById('portfolioData').innerHTML = html;
+        }
+
+        function updateQuotesData(quotes) {
+            if (!quotes || quotes.length === 0) {
+                document.getElementById('quotesData').innerHTML = '<div class="loading">No market data available</div>';
+                return;
+            }
+            
+            let html = '<table class="table"><thead><tr><th>Symbol</th><th>Price</th><th>Change</th><th>Volume</th></tr></thead><tbody>';
+            
+            quotes.slice(0, 8).forEach(quote => {
+                const changeClass = quote.change_percent >= 0 ? 'positive' : 'negative';
+                html += `
+                    <tr>
+                        <td><strong>${quote.symbol}</strong></td>
+                        <td>₹${quote.price.toFixed(2)}</td>
+                        <td class="${changeClass}">${quote.change_percent.toFixed(2)}%</td>
+                        <td>${formatNumber(quote.volume)}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('quotesData').innerHTML = html;
+            document.getElementById('activeSymbols').textContent = quotes.length;
+        }
+
+        function updateSignalsData(signals) {
+            if (!signals || signals.length === 0) {
+                document.getElementById('signalsData').innerHTML = '<div class="loading">No signals available</div>';
+                return;
+            }
+            
+            let html = '<table class="table"><thead><tr><th>Symbol</th><th>Signal</th><th>Confidence</th><th>Time</th></tr></thead><tbody>';
+            
+            signals.slice(0, 10).forEach(signal => {
+                const signalClass = `signal-${signal.signal_type.toLowerCase()}`;
+                const time = new Date(signal.timestamp).toLocaleTimeString();
+                html += `
+                    <tr>
+                        <td><strong>${signal.symbol}</strong></td>
+                        <td class="${signalClass}">${signal.signal_type}</td>
+                        <td>${signal.confidence.toFixed(1)}%</td>
+                        <td>${time}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('signalsData').innerHTML = html;
+        }
+
+        function updateOrdersData(orders) {
+            if (!orders || orders.length === 0) {
+                document.getElementById('ordersData').innerHTML = '<div class="loading">No orders available</div>';
+                return;
+            }
+            
+            let html = '<table class="table"><thead><tr><th>Symbol</th><th>Side</th><th>Qty</th><th>Status</th></tr></thead><tbody>';
+            
+            orders.slice(0, 10).forEach(order => {
+                const time = new Date(order.timestamp).toLocaleTimeString();
+                html += `
+                    <tr>
+                        <td><strong>${order.symbol}</strong></td>
+                        <td class="${order.side === 'BUY' ? 'positive' : 'negative'}">${order.side}</td>
+                        <td>${order.quantity}</td>
+                        <td>${order.status}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('ordersData').innerHTML = html;
+        }
+
+        function updateTradesData(trades) {
+            if (!trades || trades.length === 0) {
+                document.getElementById('tradesData').innerHTML = '<div class="loading">No trades available</div>';
+                return;
+            }
+            
+            let html = '<table class="table"><thead><tr><th>Symbol</th><th>Side</th><th>Entry</th><th>Exit</th><th>Qty</th><th>P&L</th><th>Date</th></tr></thead><tbody>';
+            
+            trades.forEach(trade => {
+                const pnlClass = trade.pnl >= 0 ? 'positive' : 'negative';
+                const date = new Date(trade.exit_time).toLocaleDateString();
+                html += `
+                    <tr>
+                        <td><strong>${trade.symbol}</strong></td>
+                        <td class="${trade.side === 'LONG' ? 'positive' : 'negative'}">${trade.side}</td>
+                        <td>₹${trade.entry_price.toFixed(2)}</td>
+                        <td>₹${trade.exit_price.toFixed(2)}</td>
+                        <td>${trade.quantity}</td>
+                        <td class="${pnlClass}">₹${trade.pnl.toFixed(2)}</td>
+                        <td>${date}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('tradesData').innerHTML = html;
+        }
+
+        // Utility functions
+        function formatNumber(num) {
+            if (num >= 10000000) return (num/10000000).toFixed(1) + 'Cr';
+            if (num >= 100000) return (num/100000).toFixed(1) + 'L';
+            if (num >= 1000) return (num/1000).toFixed(1) + 'K';
+            return num.toFixed(0);
+        }
+
+        function updateLastUpdate() {
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+        }
+
+        function requestUpdate(type) {
+            socket.emit('request_update', {type: type});
+            updateLastUpdate();
+        }
+
+        function generateSignals() {
+            fetch('/api/generate_signals', {method: 'POST'})
+                .then(response => response.json())
+                .then(data => {
+                    if (data.signals) {
+                        updateSignalsData(data.signals);
+                        alert(`Generated ${data.count} new signals!`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error generating signals:', error);
+                    alert('Error generating signals');
+                });
+        }
+
+        // Load initial data
+        window.onload = function() {
+            requestUpdate('all');
+        };
+    </script>
+</body>
+</html>

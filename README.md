@@ -1,301 +1,377 @@
-# AI-Powered Stock & F&O Trading Bot
+# 🚀 UNIFIED AI TRADING PLATFORM
 
-## 🔥 Overview
+A comprehensive AI-powered trading platform that integrates all your trading needs into one unified system.
 
-This is a comprehensive AI-powered trading analysis bot that actively monitors NSE/BSE markets during live trading hours. It leverages real-time data, advanced technical indicators, and machine learning to generate precise Buy/Sell signals and send them directly to your Telegram channel.
+## 🎯 Features
 
-## 🚀 Key Features
+### 🤖 AI-Powered Trading
+- **Advanced Signal Generation**: 5 different AI strategies (Trend Following, Mean Reversion, Momentum, Breakout, Volume Analysis)
+- **Multi-indicator Analysis**: RSI, MACD, Bollinger Bands, Stochastic, Williams %R, CCI, ADX
+- **Confidence Scoring**: Each signal comes with confidence percentage and detailed reasoning
+- **Automated Execution**: Automatic order placement based on high-confidence signals
 
-### 1. **Live Market Monitoring**
-- Tracks equity stocks, Nifty, Bank Nifty, and F&O instruments in real-time
-- Uses multiple data sources (Kite Connect, NSE API, Yahoo Finance)
-- Monitors 50+ Nifty stocks and major F&O instruments
+### 📊 Real-time Market Data
+- **Multi-source Data**: Yahoo Finance (primary) + Alpha Vantage (backup)
+- **Live Quotes**: Real-time price, volume, and change data
+- **Historical Data**: Comprehensive historical data for technical analysis
+- **Indian Market Focus**: Pre-configured with NIFTY 50, F&O stocks, and active watchlists
 
-### 2. **Advanced Technical Analysis**
-- **RSI, MACD, Bollinger Bands, Supertrend**
-- **Moving Averages** (EMA/SMA crossover strategies)
-- **Price Action**: Breakouts, Support/Resistance zones
-- **Candlestick Patterns**: Hammer, Doji, Engulfing patterns
-- **Multi-timeframe analysis** (5min, 15min, 1hr, daily)
+### 💼 Portfolio Management
+- **Real-time Tracking**: Live portfolio value and P&L monitoring
+- **Position Management**: Automatic position tracking with entry/exit points
+- **Risk Management**: Built-in position sizing and stop-loss management
+- **Paper Trading**: Safe testing environment with ₹10,00,000 virtual capital
 
-### 3. **AI-Powered Signal Generation**
-- **Machine Learning Models**: Random Forest, Gradient Boosting
-- **Trained on historical market data** to detect winning patterns
-- **Backtested strategies** for intraday and swing trades
-- **Confidence scoring** for each signal (0-100%)
-- **Automatic model retraining** every week
+### 🌐 Web Dashboard
+- **Real-time Updates**: Live portfolio, quotes, signals, and orders via WebSocket
+- **Interactive Interface**: Modern, responsive web interface
+- **Performance Charts**: Visual portfolio performance tracking
+- **Mobile Friendly**: Works on desktop, tablet, and mobile devices
 
-### 4. **Smart Telegram Integration**
-- Beautiful formatted signals with emojis
-- **Real-time alerts** with entry, target, and stop-loss levels
-- **Daily & weekly performance reports**
-- **Market status notifications**
-- **Error alerts** for monitoring
+### 💰 Risk Management
+- **Position Sizing**: Automatic calculation based on portfolio percentage and volatility
+- **Stop Loss**: Automatic stop-loss placement and monitoring
+- **Portfolio Limits**: Maximum position size and daily loss limits
+- **Diversification**: Maximum position count and concentration limits
 
-### 5. **Professional Backtesting Engine**
-- **Historical performance analysis**
-- **Risk metrics**: Sharpe ratio, Maximum Drawdown
-- **Trade analytics**: Win rate, Profit factor
-- **Parameter optimization**
+### ⚙️ Automated Operations
+- **Scheduled Tasks**: Automatic signal generation, portfolio updates, position monitoring
+- **Market Hours Awareness**: Only trades during Indian market hours (9:15 AM - 3:30 PM IST)
+- **End-of-Day Reports**: Automatic daily performance and activity reports
+- **Data Cleanup**: Automatic cleanup of old data to maintain performance
 
-### 6. **Robust Database System**
-- **SQLite database** for signal storage
-- **Performance tracking** and analytics
-- **Trade history** and P&L calculations
-- **Automatic data backup**
-
-## 📱 Sample Signal Output
-
-```
-🟢 BUY Signal Alert - RELIANCE
-
-🔹 Reason: RSI Oversold (28.5) + Bullish Divergence + Supertrend Reversal
-📈 Entry: ₹2,485.50
-🎯 Target: ₹2,560.00
-🛑 SL: ₹2,410.80
-🤖 Confidence: 87%
-⏰ 11:15 AM - Live Market
-
-🚨 This is an automated signal. Please do your own research before trading.
-```
-
-## 🛠️ Installation & Setup
+## 🛠️ Installation
 
 ### Prerequisites
 - Python 3.8 or higher
 - Windows/Linux/macOS
-- Internet connection for live data
+- Internet connection for market data
 
 ### Quick Setup
 
-1. **Clone/Download the project**
+1. **Clone or download the platform files**
+2. **Run the setup script:**
+   ```bash
+   python unified_setup.py
+   ```
+3. **Configure your settings:**
+   - Edit the `.env` file with your API keys (optional)
+   - Modify `unified_config.py` for trading parameters
+4. **Test the installation:**
+   ```bash
+   python unified_ai_trading_platform.py --test-mode
+   ```
+5. **Start the platform:**
+   ```bash
+   python unified_ai_trading_platform.py
+   ```
+
+### Manual Installation
+
 ```bash
-cd "AI AGENT"
+# Install dependencies
+pip install -r requirements.txt
+
+# Install TA-Lib (Windows users may need to download wheel file)
+pip install TA-Lib
+
+# Create necessary directories
+mkdir logs data reports templates static
+
+# Run the platform
+python unified_ai_trading_platform.py
 ```
 
-2. **Run the automated setup**
+## 🚀 Quick Start
+
+### 1. Test Mode
 ```bash
-python setup.py
+python unified_ai_trading_platform.py --test-mode
 ```
+This runs all startup checks without starting the full platform.
 
-3. **Configure your API keys** in `.env` file:
-```env
-# Zerodha Kite API
-KITE_API_KEY=your_api_key
-KITE_API_SECRET=your_api_secret
-KITE_ACCESS_TOKEN=your_access_token
-
-# Telegram Bot
-TELEGRAM_BOT_TOKEN=your_bot_token
-TELEGRAM_CHAT_ID=your_chat_id
-```
-
-4. **Start the bot**
+### 2. Full Platform
 ```bash
-python trading_bot.py
+python unified_ai_trading_platform.py
+```
+Starts the complete platform with:
+- AI signal generation
+- Real-time data feeds
+- Web dashboard at http://localhost:5000
+- Automated trading (if enabled)
+
+### 3. Disable Components
+```bash
+# Run without web dashboard
+python unified_ai_trading_platform.py --no-dashboard
+
+# Run without scheduled tasks
+python unified_ai_trading_platform.py --no-scheduler
 ```
 
-## 🔑 API Keys Required
+## 📊 Usage
 
-### 1. Zerodha Kite Connect (Recommended)
-- **Sign up**: [Kite Connect](https://kite.trade/)
-- **Get API Key**: Developer console
-- **Generate Access Token**: Authentication flow
-- **Cost**: ₹2,000/month for live data
+### Web Dashboard
+1. Open http://localhost:5000 in your browser
+2. View real-time portfolio, signals, and market data
+3. Generate signals manually or wait for automatic generation
+4. Monitor positions and orders in real-time
 
-### 2. Telegram Bot
-- **Create Bot**: Message @BotFather on Telegram
-- **Get Token**: Follow BotFather instructions
-- **Get Chat ID**: Message your bot and check updates
-- **Cost**: Free
+### Configuration
+Edit `unified_config.py` to customize:
+- **Watchlists**: Add/remove symbols to track
+- **Risk Parameters**: Adjust position sizing and limits
+- **Technical Indicators**: Modify RSI, MACD, and other parameters
+- **Trading Hours**: Set market timing and schedules
 
-### 3. Alternative Data Sources (Free)
-- **NSE API**: Used as fallback (rate limited)
-- **Yahoo Finance**: For backup data
-- **No cost but limited features**
+### Environment Variables
+Edit `.env` file for:
+- **API Keys**: Alpha Vantage, Telegram bot tokens
+- **Database**: SQLite database path
+- **Logging**: Log levels and file paths
+- **Features**: Enable/disable platform features
 
-## ⚙️ Configuration
+## 🔧 Architecture
 
-### Trading Parameters (config.py)
-```python
-# Risk Management
-RISK_PERCENTAGE = 2.0          # 2% risk per trade
-MAX_TRADES_PER_DAY = 10        # Maximum daily signals
+The platform consists of 7 unified modules:
 
-# Technical Indicators
-RSI_PERIOD = 14
-RSI_OVERSOLD = 30
-RSI_OVERBOUGHT = 70
-MACD_FAST = 12
-MACD_SLOW = 26
+### 1. **unified_config.py** - Configuration Management
+- Centralized configuration for all components
+- Watchlist management (NIFTY 50, F&O, Active symbols)
+- Technical indicator parameters
+- Risk management settings
+- Feature flags
 
-# AI Model
-MODEL_CONFIDENCE_THRESHOLD = 70  # Minimum 70% confidence
-```
+### 2. **unified_database.py** - Data Management
+- SQLite database with comprehensive schema
+- Portfolio, positions, orders, trades tracking
+- Signals and live data storage
+- Automatic data cleanup and maintenance
 
-### Watchlist Customization
-```python
-# Add your preferred stocks
-CUSTOM_WATCHLIST = [
-    'RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK'
-    # Add more symbols
-]
-```
+### 3. **unified_live_data.py** - Market Data
+- Multi-source real-time data (Yahoo Finance + Alpha Vantage)
+- Historical data fetching and caching
+- Quote aggregation and normalization
+- Async data operations for performance
 
-## 📊 Features in Detail
+### 4. **unified_ai_signals.py** - AI Signal Generation
+- 5 AI strategies with weighted scoring
+- Technical analysis with 15+ indicators
+- Confidence-based signal filtering
+- Automated reasoning and explanation
 
-### Signal Generation Logic
-1. **Data Collection**: Live price + historical data
-2. **Technical Analysis**: 20+ indicators calculated
-3. **AI Prediction**: ML model processes features
-4. **Signal Validation**: Confidence check + filters
-5. **Risk Management**: Auto target/SL calculation
-6. **Telegram Alert**: Formatted message sent
+### 5. **unified_trading_manager.py** - Trading Operations
+- Paper trading engine with realistic simulation
+- Order management (Market, Limit, Stop Loss)
+- Position tracking and P&L calculation
+- Risk management and validation
 
-### Backtesting Results
-```
-=== BACKTEST RESULTS ===
-• Win Rate: 73.5%
-• Total Return: +24.8%
-• Sharpe Ratio: 1.42
-• Max Drawdown: -8.3%
-• Profit Factor: 2.1
-```
+### 6. **unified_web_dashboard.py** - Web Interface
+- Real-time Flask/SocketIO dashboard
+- Live updates for all data streams
+- Interactive charts and performance tracking
+- Mobile-responsive design
 
-### Scheduling
-- **Market Hours**: 5-minute scans (9:15 AM - 3:30 PM)
-- **Daily Report**: 4:00 PM (post-market)
-- **Weekly Report**: Saturday 9:00 AM
-- **Model Training**: Sunday 8:00 PM
+### 7. **unified_ai_trading_platform.py** - Main Integration
+- Orchestrates all components
+- Scheduled task management
+- Market hours awareness
+- Graceful startup/shutdown
 
-## 🔧 Advanced Features
+## 📈 Trading Strategies
 
-### 1. Multi-Timeframe Analysis
-```python
-timeframes = ['5minute', '15minute', 'hour', 'day']
-# Signals confirmed across multiple timeframes
-```
+### 1. Trend Following (25% weight)
+- Moving average crossovers (SMA 20/50, EMA 12/26)
+- ADX trend strength confirmation
+- Price position relative to moving averages
 
-### 2. Pattern Recognition
-- Hammer, Doji, Engulfing patterns
-- Breakout detection
-- Support/Resistance levels
+### 2. Mean Reversion (20% weight)
+- RSI overbought/oversold levels
+- Bollinger Bands squeeze and expansion
+- Williams %R and CCI extremes
 
-### 3. Volume Analysis
-- Volume-price confirmation
-- Unusual volume alerts
-- Volume moving averages
+### 3. Momentum (25% weight)
+- MACD signal line crossovers
+- Stochastic oscillator patterns
+- Price momentum indicators
+- Intraday momentum analysis
 
-### 4. F&O Integration
-- Options chain analysis
-- Futures monitoring
-- Expiry-based filtering
+### 4. Breakout (15% weight)
+- 20-day high/low breakouts
+- Bollinger Bands breakouts
+- Volume confirmation
+- Support/resistance levels
 
-## 📈 Performance Tracking
+### 5. Volume Analysis (15% weight)
+- Volume vs. average volume
+- On-Balance Volume (OBV) trends
+- Price-volume divergence
+- Volume-weighted signals
 
-### Real-time Metrics
-- **Live P&L tracking**
-- **Win rate monitoring**
-- **Signal accuracy**
-- **Risk metrics**
+## 💡 Key Features
 
-### Reports
-- **Daily summary**: Signals sent, performance
-- **Weekly analysis**: Detailed breakdown
-- **Monthly review**: Strategy effectiveness
+### Intelligent Signal Scoring
+Each signal combines all 5 strategies with weighted scoring:
+- **BUY Signal**: Weighted score > 20
+- **SELL Signal**: Weighted score < -20  
+- **HOLD Signal**: Weighted score between -20 and 20
+- **Confidence**: Absolute value of weighted score (0-95%)
 
-## 🚨 Risk Management
+### Risk Management
+- **Position Sizing**: Max 5% of portfolio per position
+- **Portfolio Risk**: Max 2% total portfolio risk
+- **Daily Limits**: 3% daily loss limit
+- **Stop Losses**: Automatic 2% stop loss on all positions
+- **Take Profits**: 3% profit targets with 1.5:1 risk-reward
 
-### Built-in Safety Features
-1. **Position sizing**: Max 2% risk per trade
-2. **Daily limits**: Max 10 signals per day
-3. **Confidence filtering**: Min 70% confidence
-4. **Stop-loss automation**: Auto SL calculation
-5. **Duplicate prevention**: No repeat signals
+### Market Integration
+- **Indian Market Hours**: 9:15 AM - 3:30 PM IST
+- **Weekend Awareness**: No trading on weekends
+- **Holiday Detection**: Market holiday awareness
+- **Pre-configured Symbols**: NIFTY 50, F&O stocks, active symbols
 
-### Disclaimers
-⚠️ **This bot is for educational purposes**
-⚠️ **Always do your own research**
-⚠️ **Past performance doesn't guarantee future results**
-⚠️ **Trading involves risk of loss**
+## 📊 Dashboard Features
 
-## 🐛 Troubleshooting
+### Real-time Data
+- **Portfolio Summary**: Live value, P&L, positions
+- **Market Quotes**: Real-time prices for watchlist symbols  
+- **AI Signals**: Latest signals with confidence and reasoning
+- **Orders & Trades**: Active orders and completed trades
+
+### Interactive Features
+- **Manual Signal Generation**: Generate signals on demand
+- **Order Placement**: Place manual orders through the interface
+- **Historical Charts**: View price history and indicators
+- **Performance Tracking**: Portfolio performance over time
+
+### WebSocket Updates
+- **Live Updates**: Real-time data via WebSocket connections
+- **Automatic Refresh**: Data updates every 5-30 seconds
+- **Connection Status**: Visual connection status indicator
+- **Error Handling**: Graceful error handling and reconnection
+
+## 🔒 Security & Safety
+
+### Paper Trading Only
+- **No Real Money**: Virtual trading environment only
+- **Safe Testing**: Test strategies without financial risk
+- **Realistic Simulation**: Includes slippage, commissions, and market conditions
+
+### Data Protection
+- **Local Storage**: All data stored locally in SQLite
+- **No Account Access**: No broker account integration
+- **API Key Security**: Optional API keys stored in environment files
+
+### Risk Controls
+- **Position Limits**: Maximum position sizes and counts
+- **Loss Limits**: Daily and total loss limits
+- **Validation**: Order validation before execution
+- **Manual Override**: Manual control over all operations
+
+## 📚 Documentation
+
+### Configuration Files
+- **`unified_config.py`**: Main configuration parameters
+- **`.env`**: Environment variables and API keys
+- **`requirements.txt`**: Python package dependencies
+
+### Log Files
+- **`unified_trading_platform.log`**: Main platform logs
+- **`eod_report_YYYYMMDD.txt`**: Daily end-of-day reports
+
+### Database
+- **`unified_trading.db`**: SQLite database with all data
+- **Automatic Backups**: Database backed up during cleanup
+
+## 🚨 Troubleshooting
 
 ### Common Issues
 
-**1. TA-Lib Installation Error**
+#### 1. TA-Lib Installation
+**Windows:**
 ```bash
-# Windows
-pip install TA-Lib (from precompiled wheel)
+# Download wheel from https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib
+pip install TA_Lib‑0.4.xx‑cpxx‑cpxxm‑win_amd64.whl
+```
 
-# Linux
+**Linux:**
+```bash
 sudo apt-get install libta-lib-dev
 pip install TA-Lib
+```
 
-# macOS
+**macOS:**
+```bash
 brew install ta-lib
 pip install TA-Lib
 ```
 
-**2. Telegram Not Working**
-- Check bot token and chat ID
-- Ensure bot is added to channel/group
-- Test connection with `/start` command
+#### 2. Import Errors
+- Ensure all requirements are installed: `pip install -r requirements.txt`
+- Check Python version: Must be 3.8 or higher
+- Verify virtual environment activation
 
-**3. No Market Data**
-- Verify API credentials
+#### 3. Market Data Issues
 - Check internet connection
-- Review API usage limits
+- Verify symbols are correct (use Indian stock symbols)
+- Check Yahoo Finance API status
+- Add Alpha Vantage API key for backup
 
-**4. Database Errors**
-- Check file permissions
-- Ensure SQLite is available
-- Restart the bot
+#### 4. Database Errors
+- Check file permissions in the directory
+- Ensure SQLite is available (built into Python)
+- Delete `unified_trading.db` to reset database
+
+#### 5. Web Dashboard Issues
+- Check port 5000 is not in use
+- Try different port: edit `unified_web_dashboard.py`
+- Check firewall settings
+- Use `127.0.0.1:5000` instead of `localhost:5000`
+
+### Getting Help
+1. Check the log file: `unified_trading_platform.log`
+2. Run in test mode: `python unified_ai_trading_platform.py --test-mode`
+3. Check individual modules work: `python unified_live_data.py`
+4. Verify configuration: Review `unified_config.py` settings
+
+## 🎯 Performance Tips
+
+### Optimization
+- **Symbol Limit**: Keep watchlist under 50 symbols for best performance
+- **Update Frequency**: Adjust update intervals in configuration
+- **Database Cleanup**: Regular cleanup of old data (automatic)
+- **Memory Usage**: Monitor memory usage with large datasets
+
+### Best Practices
+- **Backtesting**: Test strategies with historical data first
+- **Paper Trading**: Always use paper trading mode
+- **Risk Management**: Never risk more than you can afford to lose
+- **Diversification**: Don't put all capital in one position
 
 ## 📞 Support
 
-### Getting Help
-1. **Check logs**: `trading_bot.log`
-2. **Review configuration**: `.env` file
-3. **Test connections**: Run setup again
-4. **Monitor Telegram**: Error alerts sent automatically
+### Platform Information
+- **Version**: 1.0.0
+- **Python**: 3.8+ required
+- **Database**: SQLite (included)
+- **License**: Open source
 
-### File Structure
-```
-AI AGENT/
-├── trading_bot.py          # Main bot file
-├── config.py              # Configuration
-├── setup.py               # Setup script
-├── requirements.txt       # Dependencies
-├── .env.example          # Environment template
-├── data/
-│   └── data_provider.py  # Market data
-├── analysis/
-│   └── technical_analysis.py
-├── ai/
-│   └── signal_generator.py
-├── notifications/
-│   └── telegram_notifier.py
-├── database/
-│   └── db_manager.py
-└── utils/
-    └── logger.py
-```
-
-## 🎯 Next Steps
-
-1. **Configure API keys** in `.env`
-2. **Test with paper trading** first
-3. **Monitor performance** for 1-2 weeks
-4. **Adjust parameters** based on results
-5. **Scale up** gradually
-
-## 📝 License
-
-This project is for educational purposes. Use at your own risk.
+### Features Status
+- ✅ **AI Signals**: Fully implemented with 5 strategies
+- ✅ **Live Data**: Yahoo Finance + Alpha Vantage
+- ✅ **Paper Trading**: Complete simulation environment
+- ✅ **Web Dashboard**: Real-time interface
+- ✅ **Risk Management**: Comprehensive controls
+- ✅ **Automation**: Scheduled tasks and monitoring
 
 ---
 
-**Happy Trading! 📈🚀**
+## 🎉 Happy Trading!
 
-*Remember: The best traders combine AI insights with human judgment!*
+This unified platform brings together everything you need for AI-powered trading in one integrated system. Start with paper trading, test your strategies, and explore the power of automated AI signals!
+
+**Remember**: This is for educational and paper trading purposes only. Always do your own research and never risk money you cannot afford to lose.
+
+---
+
+*Developed with ❤️ for the trading community*

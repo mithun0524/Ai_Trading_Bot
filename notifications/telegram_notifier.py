@@ -1,13 +1,16 @@
 import os
 import asyncio
 import json
+import logging
 from datetime import datetime
 from typing import Dict, Optional
 import aiohttp
 from telegram import Bot
 from telegram.error import TelegramError
 import requests  # For synchronous requests
-from utils.logger import logger
+
+# Use standard logging instead of utils.logger
+logger = logging.getLogger(__name__)
 
 class TelegramNotifier:
     def __init__(self, config):
@@ -25,6 +28,34 @@ class TelegramNotifier:
         else:
             logger.warning("Telegram bot token not configured")
             self.bot = None
+    
+    def send_text_message(self, message: str) -> bool:
+        """Send a simple text message"""
+        if not self.bot_token or not self.chat_id:
+            logger.warning("Telegram not configured")
+            return False
+        
+        try:
+            url = f"https://api.telegram.org/bot{self.bot_token}/sendMessage"
+            
+            data = {
+                'chat_id': self.chat_id,
+                'text': message,
+                'parse_mode': 'HTML'
+            }
+            
+            response = requests.post(url, data=data, timeout=10)
+            
+            if response.status_code == 200:
+                logger.info(f"Text message sent to Telegram successfully")
+                return True
+            else:
+                logger.error(f"Failed to send text message: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error sending text message: {e}")
+            return False
     
     def send_signal_sync(self, signal: Dict) -> bool:
         """Send trading signal synchronously (for testing and simple usage)"""

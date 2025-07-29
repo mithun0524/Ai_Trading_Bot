@@ -231,6 +231,38 @@ class DatabaseManager:
             logger.error(f"Error getting signals by date: {e}")
             return []
     
+    def get_recent_signals(self, limit: int = 50) -> List[Dict]:
+        """Get recent signals with limit"""
+        try:
+            with sqlite3.connect(self.db_file) as conn:
+                cursor = conn.cursor()
+                
+                cursor.execute('''
+                    SELECT * FROM signals 
+                    ORDER BY timestamp DESC
+                    LIMIT ?
+                ''', (limit,))
+                
+                columns = [description[0] for description in cursor.description]
+                results = cursor.fetchall()
+                
+                signals = []
+                for row in results:
+                    signal = dict(zip(columns, row))
+                    # Convert timestamp string to datetime if needed
+                    if 'timestamp' in signal and isinstance(signal['timestamp'], str):
+                        try:
+                            signal['timestamp'] = datetime.fromisoformat(signal['timestamp'].replace('Z', '+00:00'))
+                        except:
+                            pass
+                    signals.append(signal)
+                
+                return signals
+                
+        except Exception as e:
+            logger.error(f"Error getting recent signals: {e}")
+            return []
+    
     def get_performance_metrics(self, days: int = 30) -> Dict:
         """Get performance metrics for the last N days"""
         try:
