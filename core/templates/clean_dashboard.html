@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apex AI Trading Platform — Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="/static/manifest.json">
+  <meta name="theme-color" content="#0b0b0c" />
+  <style>
+    :root {
+      --bg: #0b0b0c;
+      --panel: #121214;
+      --panel-2: #151518;
+      --border: #1f2024;
+      --muted: #9ca3af;
+      --text: #e5e7eb;
+      --green: #10b981;
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --blue: #3b82f6;
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text); font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 16px; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border: 1px solid var(--border); background: var(--panel); border-radius: var(--radius); position: sticky; top: 0; z-index: 10; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); box-shadow: 0 0 12px rgba(16,185,129,.6); }
+    .brand h1 { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: .2px; }
+    .actions { display: flex; align-items: center; gap: 8px; }
+    button, .btn { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-weight: 600; cursor: pointer; }
+    button:hover, .btn:hover { border-color: #2b2c31; }
+    .btn-primary { background: #1c1c20; border-color: #2a2b30; }
+    .grid { margin-top: 12px; display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px; }
+    .panel { border: 1px solid var(--border); background: var(--panel); border-radius: var(--radius); padding: 12px; }
+    .panel h2 { margin: 0 0 10px; font-size: 14px; color: var(--muted); font-weight: 600; letter-spacing: .3px; }
+    .metrics { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
+    .metric { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+    .metric .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .4px; }
+    .metric .value { margin-top: 6px; font-size: 18px; font-weight: 700; }
+    .metric .delta { margin-top: 4px; font-size: 12px; color: var(--muted); }
+    .positive { color: var(--green); }
+    .negative { color: var(--red); }
+    .neutral { color: var(--muted); }
+    .flex { display: flex; gap: 12px; }
+    .col { flex: 1; }
+    .list { display: grid; gap: 8px; }
+  .row { display: grid; grid-template-columns: 1fr auto auto auto auto; gap: 8px; align-items: center; background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
+    .symbol { font-weight: 600; }
+    .price { color: var(--text); font-variant-numeric: tabular-nums; }
+    .chg { font-variant-numeric: tabular-nums; }
+  .spark { width: 90px; height: 28px; display: inline-block; }
+  .spark svg { width: 100%; height: 100%; display: block; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); font-size: 13px; }
+    thead th { color: var(--muted); font-weight: 600; }
+    .toolbar { display: flex; gap: 8px; align-items: center; }
+    input[type=text], input[type=number] { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
+    .toast-wrap { position: fixed; top: 14px; right: 14px; display: grid; gap: 8px; z-index: 50; }
+    .toast { background: #161617; border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 8px; font-size: 13px; }
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+  </style>
+  </head>
+  <body>
+    <div class="toast-wrap" id="toasts"></div>
+    <div class="wrap">
+      <header>
+        <div class="brand"><span class="dot" id="connDot"></span><h1>Apex AI Trading Platform</h1></div>
+        <div class="actions">
+          <button class="btn" id="refreshBtn">Refresh</button>
+          <button class="btn btn-primary" id="genSigBtn">Generate Signals</button>
+        </div>
+      </header>
+
+      <section class="panel">
+        <div class="metrics" id="metrics">
+          <div class="metric"><div class="label">Portfolio Value</div><div class="value" id="m_value">—</div><div class="delta" id="m_value_delta">—</div></div>
+          <div class="metric"><div class="label">Total P&L</div><div class="value" id="m_pnl">—</div><div class="delta" id="m_pnl_delta">—</div></div>
+          <div class="metric"><div class="label">Positions</div><div class="value" id="m_pos">—</div><div class="delta" id="m_pos_delta">—</div></div>
+          <div class="metric"><div class="label">Win Rate</div><div class="value" id="m_win">—</div><div class="delta" id="m_win_delta">—</div></div>
+        </div>
+      </section>
+
+      <div class="grid">
+        <section class="panel col">
+          <div class="toolbar" style="justify-content: space-between; margin-bottom: 8px;">
+            <h2>Watchlist</h2>
+            <div class="toolbar">
+              <input type="text" id="wlSearch" placeholder="Symbol..." style="width: 120px;">
+              <button class="btn" id="wlBtn">Update</button>
+            </div>
+          </div>
+          <div id="watchlist" class="list"></div>
+        </section>
+
+        <section class="panel col">
+          <div class="toolbar" style="justify-content: space-between; margin-bottom: 8px;">
+            <h2>Quick Trade</h2>
+          </div>
+          <div class="toolbar" style="gap: 10px;">
+            <input type="text" id="qSymbol" placeholder="RELIANCE" style="width: 130px;">
+            <input type="number" id="qQty" value="1" min="1" step="1" style="width: 90px;">
+            <button class="btn" id="buyBtn">Buy</button>
+            <button class="btn" id="sellBtn">Sell</button>
+            <div id="qPrice" class="neutral" style="margin-left:auto; font-size: 13px;"></div>
+          </div>
+        </section>
+      </div>
+
+      <div class="grid" style="margin-top: 12px;">
+        <section class="panel col">
+          <div class="toolbar" style="justify-content: space-between; margin-bottom: 8px;">
+            <h2>Signals</h2>
+          </div>
+          <table>
+            <thead><tr><th>Symbol</th><th>Signal</th><th>Conf.</th><th>Time</th></tr></thead>
+            <tbody id="signals"></tbody>
+          </table>
+        </section>
+
+        <section class="panel col">
+          <div class="toolbar" style="justify-content: space-between; margin-bottom: 8px;">
+            <h2>Orders & Trades</h2>
+          </div>
+          <div style="display:grid; gap:12px;">
+            <div>
+              <div class="toolbar" style="justify-content: space-between; margin: 6px 0;">
+                <div style="color:var(--muted); font-weight:600; font-size:12px; letter-spacing:.3px;">Orders</div>
+              </div>
+              <table>
+                <thead><tr><th>Status</th><th>Side</th><th>Symbol</th><th>Qty</th><th>Price</th><th>Time</th></tr></thead>
+                <tbody id="orders"></tbody>
+              </table>
+            </div>
+            <div>
+              <div class="toolbar" style="justify-content: space-between; margin: 6px 0;">
+                <div style="color:var(--muted); font-weight:600; font-size:12px; letter-spacing:.3px;">Trades</div>
+              </div>
+              <table>
+                <thead><tr><th>Type</th><th>Symbol</th><th>Qty</th><th>Price</th><th>P&L</th><th>Date</th></tr></thead>
+                <tbody id="trades"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      const socket = io();
+      const $ = (id) => document.getElementById(id);
+      const state = { market: [], quotes: [], symbols: [], prices: {}, sparkCache: {}, sparkInflight: {} };
+      let renderTimer = null;
+      function scheduleRender() {
+        if (renderTimer) return;
+        renderTimer = setTimeout(() => {
+          renderTimer = null;
+          const list = state.quotes && state.quotes.length ? state.quotes : state.market;
+          renderWatchlistSymbols(state.symbols, list);
+        }, 500);
+      }
+
+      function toast(msg, kind='info') {
+        const t = document.createElement('div');
+        t.className = 'toast';
+        t.textContent = msg;
+        $('toasts').appendChild(t);
+        setTimeout(() => t.remove(), 3500);
+      }
+
+      // Connection status
+      socket.on('connect', () => { $('connDot').style.background = 'var(--green)'; });
+      socket.on('disconnect', () => { $('connDot').style.background = 'var(--red)'; });
+
+      // Portfolio
+      socket.on('portfolio_update', (data) => renderPortfolio(data));
+      // Unified dashboard_update
+      socket.on('dashboard_update', (data) => {
+        if (data.portfolio) renderPortfolio(data.portfolio);
+        if (data.signals) renderSignals(Array.isArray(data.signals)?data.signals:(data.signals.signals||[]));
+        if (data.trades) renderTrades(data.trades);
+        if (data.orders) renderOrders(data.orders);
+        if (data.market) { state.market = data.market; scheduleRender(); }
+      });
+
+      // Market / quotes
+      // Only schedule one render to avoid double work when both events arrive
+      socket.on('market_update', (list) => { state.market = list || []; scheduleRender(); });
+      socket.on('quotes_update', (payload) => {
+        const list = payload && payload.quotes ? payload.quotes : [];
+        state.quotes = list;
+        scheduleRender();
+        updateQuickPrice();
+      });
+
+      // Signals
+      socket.on('signals_update', (payload) => {
+        const list = Array.isArray(payload) ? payload : (payload && payload.signals) ? payload.signals : [];
+        renderSignals(list);
+      });
+
+  // Trades (if emitted separately)
+  socket.on('trades_update', (list) => { renderTrades(Array.isArray(list)?list:(list && list.trades)||[]); });
+  // Orders + trades combined periodic payload
+  socket.on('orders_update', (payload) => { const trades = payload && payload.trades ? payload.trades : []; const orders = payload && payload.orders ? payload.orders : []; renderTrades(trades); renderOrders(orders); });
+
+      function renderPortfolio(p) {
+        try {
+          $('m_value').textContent = '₹' + (p.portfolio_value || 0).toLocaleString('en-IN');
+          $('m_pnl').textContent = '₹' + (p.total_pnl || 0).toLocaleString('en-IN');
+          $('m_pnl').className = 'value ' + ((p.total_pnl||0) >= 0 ? 'positive' : 'negative');
+          $('m_pos').textContent = p.total_positions || 0;
+          $('m_win').textContent = (p.win_rate || 0).toFixed(1) + '%';
+        } catch(_){}
+      }
+
+      function renderSignals(list) {
+        const tb = $('signals');
+        if (!list || !list.length) { tb.innerHTML = '<tr><td colspan="4" class="neutral">No signals</td></tr>'; return; }
+        tb.innerHTML = list.slice(0, 20).map(s => {
+          const cl = s.signal_type === 'BUY' ? 'positive' : s.signal_type === 'SELL' ? 'negative' : 'neutral';
+          const ts = s.created_at || s.timestamp;
+          const conf = typeof s.confidence === 'number' ? s.confidence.toFixed(1) : s.confidence;
+          return `<tr>
+            <td class="symbol">${s.symbol}</td>
+            <td class="${cl}">${s.signal_type}</td>
+            <td>${conf}%</td>
+            <td>${ts ? new Date(ts).toLocaleTimeString() : ''}</td>
+          </tr>`;
+        }).join('');
+      }
+
+      function renderTrades(list) {
+        const tb = $('trades');
+        if (!list || !list.length) { tb.innerHTML = '<tr><td colspan="6" class="neutral">No trades</td></tr>'; return; }
+        tb.innerHTML = list.slice(0, 15).map(t => {
+          const pnl = t.pnl ?? 0; const pnlCl = pnl >= 0 ? 'positive' : 'negative';
+          const price = (t.exit_price ?? t.price ?? 0);
+          return `<tr>
+            <td>${t.side || t.trade_type || '-'}</td>
+            <td class="symbol">${t.symbol}</td>
+            <td>${t.quantity ?? '-'}</td>
+            <td>₹${Number(price).toFixed(2)}</td>
+            <td class="${pnlCl}">₹${Number(pnl).toFixed(2)}</td>
+            <td>${t.exit_time ? new Date(t.exit_time).toLocaleString() : (t.timestamp ? new Date(t.timestamp).toLocaleString() : '')}</td>
+          </tr>`;
+        }).join('');
+      }
+
+      function renderOrders(list) {
+        const tb = $('orders');
+        if (!list || !list.length) { tb.innerHTML = '<tr><td colspan="6" class="neutral">No orders</td></tr>'; return; }
+        tb.innerHTML = list.slice(0, 20).map(o => {
+          const price = o.price ?? 0;
+          const status = (o.status || '').toUpperCase();
+          return `<tr>
+            <td class="${status==='FILLED'?'positive':status==='REJECTED'?'negative':'neutral'}">${status || '-'}</td>
+            <td class="${(o.side||'')==='BUY'?'positive':'negative'}">${o.side || '-'}</td>
+            <td class="symbol">${o.symbol}</td>
+            <td>${o.quantity ?? '-'}</td>
+            <td>₹${Number(price).toFixed(2)}</td>
+            <td>${o.timestamp ? new Date(o.timestamp).toLocaleTimeString() : ''}</td>
+          </tr>`;
+        }).join('');
+      }
+
+  function renderWatchlistSymbols(symbols, marketList) {
+        const host = $('watchlist');
+        if (!symbols || !symbols.length) { host.innerHTML = '<div class="neutral" style="font-size:13px;">No symbols loaded</div>'; return; }
+        const map = {}; (marketList || []).forEach(q => map[q.symbol] = q);
+        host.innerHTML = symbols.map(sym => {
+          const q = map[sym];
+          const price = q && typeof q.price === 'number' ? q.price.toFixed(2) : '—';
+          const chg = q && typeof q.change_percent === 'number' ? q.change_percent.toFixed(2) + '%' : (q && typeof q.change === 'number' ? q.change.toFixed(2)+'%' : '');
+          const chgCl = (q && ((q.change_percent ?? q.change) || 0) ) >= 0 ? 'positive' : 'negative';
+          return `<div class="row">
+            <div class="symbol">${sym}</div>
+            <div class="price">₹${price}</div>
+            <div class="chg ${chgCl}">${chg}</div>
+            <div class="spark" id="spk-${sym}"></div>
+            <div><a href="#" onclick="setQuick('${sym}')" class="btn" style="padding:6px 8px;">Trade</a></div>
+          </div>`;
+        }).join('');
+
+  // Lazy-load sparklines for first 10 symbols with caching to avoid repeated fetches
+  symbols.slice(0, 10).forEach(sym => loadSparkline(sym));
+      }
+
+      function setQuick(sym){ $('qSymbol').value = sym; updateQuickPrice(); }
+
+      function updateQuickPrice(){
+        const sym = $('qSymbol').value.trim().toUpperCase();
+        if (!sym) { $('qPrice').textContent = ''; return; }
+        fetch(`/api/quote/${sym}`).then(r => r.json()).then(d => {
+          if (d && d.price) {
+            $('qPrice').textContent = `${sym} ₹${Number(d.price).toFixed(2)} (${(d.change ?? 0) >= 0 ? '+' : ''}${Number(d.change ?? 0).toFixed(2)}%)`;
+          } else { $('qPrice').textContent = ''; }
+        }).catch(()=>{ $('qPrice').textContent = ''; });
+      }
+
+      function requestUpdate(type='all'){ socket.emit('request_update', { type }); }
+
+      function generateSignals(){
+        const btn = $('genSigBtn'); btn.disabled = true;
+        fetch('/api/generate_signals', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) })
+          .then(r => r.json()).then(d => {
+            if (d && d.error) { toast(d.error, 'error'); return; }
+            const count = typeof d.count === 'number' ? d.count : (Array.isArray(d.signals) ? d.signals.length : 0);
+            toast(`Generated ${count} signals`, 'success');
+            if (Array.isArray(d.signals)) renderSignals(d.signals);
+            requestUpdate('signals');
+          }).catch(() => toast('Error generating signals', 'error'))
+          .finally(() => btn.disabled = false);
+      }
+
+      function place(side){
+        const symbol = $('qSymbol').value.trim().toUpperCase();
+        const quantity = parseInt(($('qQty').value||'1'), 10);
+        if (!symbol || !quantity || quantity < 1) { toast('Enter symbol and valid quantity'); return; }
+        fetch('/api/place_order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ symbol, side, quantity, order_type: 'MARKET' }) })
+          .then(r => r.json()).then(d => {
+            if (d && d.success) { toast(`${side} ${quantity} ${symbol} placed`,'success'); requestUpdate('trades'); }
+            else { toast(d.error || d.message || 'Order failed','error'); }
+          }).catch(() => toast('Order error','error'));
+      }
+
+      // Wire buttons
+      $('refreshBtn').onclick = () => requestUpdate('all');
+      $('genSigBtn').onclick = generateSignals;
+      $('buyBtn').onclick = () => place('BUY');
+      $('sellBtn').onclick = () => place('SELL');
+      $('qSymbol').addEventListener('input', updateQuickPrice);
+      $('wlBtn').onclick = () => requestUpdate('quotes');
+
+      // Initial bootstrap: watchlist
+      fetch('/api/watchlist').then(r => r.json()).then(d => {
+        const syms = (d && Array.isArray(d.symbols)) ? d.symbols : [];
+        state.symbols = syms; renderWatchlistSymbols(syms, state.market);
+        requestUpdate('all');
+      }).catch(() => { requestUpdate('all'); });
+
+      function drawSpark(el, points) {
+        if (!points || !points.length) { el.innerHTML = ''; return; }
+        const min = Math.min.apply(null, points), max = Math.max.apply(null, points);
+        const w = 90, h = 28, pad = 2;
+        const scaleX = (i) => pad + (i * (w - pad*2) / (points.length - 1 || 1));
+        const scaleY = (v) => h - pad - (max === min ? h/2 : ((v - min) * (h - pad*2) / (max - min)));
+        const path = points.map((v,i) => `${i===0?'M':'L'}${scaleX(i)},${scaleY(v)}`).join(' ');
+        const up = points[points.length-1] >= points[0];
+        const stroke = up ? '#10b981' : '#ef4444';
+        el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+            <path d="${path}" fill="none" stroke="${stroke}" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"></path>
+        </svg>`;
+      }
+
+      // Draw sparkline for a symbol from historical data with 5-min client cache and inflight guard
+      function loadSparkline(sym) {
+        const el = $('spk-' + sym); if (!el) return;
+        const now = Date.now();
+        const cached = state.sparkCache[sym];
+        if (cached && (now - cached.ts) < 5*60*1000) { drawSpark(el, cached.points); return; }
+        if (state.sparkInflight[sym]) return; // avoid duplicate requests while one is running
+        state.sparkInflight[sym] = true;
+        fetch(`/api/historical/${sym}?period=1mo`).then(r => r.json()).then(d => {
+          const points = (d && Array.isArray(d.data)) ? d.data.map(x => Number(x.close) || 0).filter(n => !isNaN(n)) : [];
+          state.sparkCache[sym] = { ts: Date.now(), points };
+          drawSpark(el, points);
+        }).catch(() => { el.innerHTML = ''; })
+          .finally(() => { delete state.sparkInflight[sym]; });
+      }
+
+      // PWA: register service worker (optional, non-blocking)
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/static/sw.js').catch(() => void 0);
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,31 @@
+
+📋 END-OF-DAY REPORT - 2025-08-27
+============================================================
+
+💼 PORTFOLIO SUMMARY:
+   Portfolio Value: ₹1,000,000.00
+   Cash Balance: ₹1,000,000.00
+   Total P&L: ₹0.00
+   Active Positions: 0
+   
+🎯 TODAY'S SIGNALS:
+   Total Signals: 105
+   BUY Signals: 21
+   SELL Signals: 35
+   
+💰 TODAY'S TRADES:
+   Completed Trades: 0
+   Total P&L: ₹0.00
+   
+📊 PERFORMANCE STATS:
+   Win Rate: 0.0%
+   Total Trades: 0
+   Orders Placed Today: 0
+   Signals Generated Today: 105
+   
+⏱️  SYSTEM UPTIME:
+   Started: 2025-08-26 22:40:42
+   Uptime: 2:21:20.747466
+
+============================================================
+            

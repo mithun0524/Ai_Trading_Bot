@@ -1,4 +1,4 @@
-# 🚀 UNIFIED AI TRADING PLATFORM
+# 🚀 Apex AI Trading Platform
 
 A comprehensive AI-powered trading platform that integrates all your trading needs into one unified system.
 
@@ -11,7 +11,7 @@ A comprehensive AI-powered trading platform that integrates all your trading nee
 - **Automated Execution**: Automatic order placement based on high-confidence signals
 
 ### 📊 Real-time Market Data
-- **Multi-source Data**: Yahoo Finance (primary) + Alpha Vantage (backup)
+- **Data Source**: Yahoo Finance (enforced)
 - **Live Quotes**: Real-time price, volume, and change data
 - **Historical Data**: Comprehensive historical data for technical analysis
 - **Indian Market Focus**: Pre-configured with NIFTY 50, F&O stocks, and active watchlists
@@ -23,10 +23,9 @@ A comprehensive AI-powered trading platform that integrates all your trading nee
 - **Paper Trading**: Safe testing environment with ₹10,00,000 virtual capital
 
 ### 🌐 Web Dashboard
+- **Single Dashboard**: One clean, minimal black theme at /app
 - **Real-time Updates**: Live portfolio, quotes, signals, and orders via WebSocket
-- **Interactive Interface**: Modern, responsive web interface
-- **Performance Charts**: Visual portfolio performance tracking
-- **Mobile Friendly**: Works on desktop, tablet, and mobile devices
+- **Responsive**: Works great on desktop and mobile
 
 ### 💰 Risk Management
 - **Position Sizing**: Automatic calculation based on portfolio percentage and volatility
@@ -52,18 +51,18 @@ A comprehensive AI-powered trading platform that integrates all your trading nee
 1. **Clone or download the platform files**
 2. **Run the setup script:**
    ```bash
-   python unified_setup.py
+   python main.py --setup
    ```
 3. **Configure your settings:**
    - Edit the `.env` file with your API keys (optional)
-   - Modify `unified_config.py` for trading parameters
+   - Modify `core/unified_config.py` for trading parameters
 4. **Test the installation:**
    ```bash
-   python unified_ai_trading_platform.py --test-mode
+   python main.py --test
    ```
 5. **Start the platform:**
-   ```bash
-   python unified_ai_trading_platform.py
+   ```powershell
+   python -u main.py
    ```
 
 ### Manual Installation
@@ -79,46 +78,46 @@ pip install TA-Lib
 mkdir logs data reports templates static
 
 # Run the platform
-python unified_ai_trading_platform.py
+python main.py
 ```
 
 ## 🚀 Quick Start
 
 ### 1. Test Mode
 ```bash
-python unified_ai_trading_platform.py --test-mode
+python main.py --test
 ```
 This runs all startup checks without starting the full platform.
 
 ### 2. Full Platform
-```bash
-python unified_ai_trading_platform.py
+```powershell
+python -u main.py
 ```
 Starts the complete platform with:
 - AI signal generation
 - Real-time data feeds
-- Web dashboard at http://localhost:5000
+- Landing page at http://127.0.0.1:5000 and dashboard at http://127.0.0.1:5000/app
 - Automated trading (if enabled)
 
 ### 3. Disable Components
 ```bash
 # Run without web dashboard
-python unified_ai_trading_platform.py --no-dashboard
+python main.py --no-dashboard
 
 # Run without scheduled tasks
-python unified_ai_trading_platform.py --no-scheduler
+python main.py --no-scheduler
 ```
 
 ## 📊 Usage
 
 ### Web Dashboard
-1. Open http://localhost:5000 in your browser
-2. View real-time portfolio, signals, and market data
+1. Open http://127.0.0.1:5000 in your browser (landing)
+2. Click "Open Dashboard" to go to /app and view real-time portfolio, signals, and market data
 3. Generate signals manually or wait for automatic generation
 4. Monitor positions and orders in real-time
 
 ### Configuration
-Edit `unified_config.py` to customize:
+Edit `core/unified_config.py` to customize:
 - **Watchlists**: Add/remove symbols to track
 - **Risk Parameters**: Adjust position sizing and limits
 - **Technical Indicators**: Modify RSI, MACD, and other parameters
@@ -135,44 +134,43 @@ Edit `.env` file for:
 
 The platform consists of 7 unified modules:
 
-### 1. **unified_config.py** - Configuration Management
+### 1. **core/unified_config.py** - Configuration Management
 - Centralized configuration for all components
 - Watchlist management (NIFTY 50, F&O, Active symbols)
 - Technical indicator parameters
 - Risk management settings
 - Feature flags
 
-### 2. **unified_database.py** - Data Management
+### 2. **core/unified_database.py** - Data Management
 - SQLite database with comprehensive schema
 - Portfolio, positions, orders, trades tracking
 - Signals and live data storage
 - Automatic data cleanup and maintenance
 
-### 3. **unified_live_data.py** - Market Data
-- Multi-source real-time data (Yahoo Finance + Alpha Vantage)
+### 3. **core/unified_live_data.py** - Market Data
+- Yahoo Finance real-time and historical data
 - Historical data fetching and caching
 - Quote aggregation and normalization
 - Async data operations for performance
 
-### 4. **unified_ai_signals.py** - AI Signal Generation
+### 4. **core/unified_ai_signals.py** - AI Signal Generation
 - 5 AI strategies with weighted scoring
 - Technical analysis with 15+ indicators
 - Confidence-based signal filtering
 - Automated reasoning and explanation
 
-### 5. **unified_trading_manager.py** - Trading Operations
+### 5. **core/unified_trading_manager.py** - Trading Operations
 - Paper trading engine with realistic simulation
 - Order management (Market, Limit, Stop Loss)
 - Position tracking and P&L calculation
 - Risk management and validation
 
-### 6. **unified_web_dashboard.py** - Web Interface
-- Real-time Flask/SocketIO dashboard
-- Live updates for all data streams
-- Interactive charts and performance tracking
-- Mobile-responsive design
+### 6. **core/unified_web_dashboard.py** - Web Interface
+- Single Flask/Socket.IO dashboard (/app) with landing at /
+- Live updates for portfolio, quotes, signals, orders
+- PWA assets served from /static
 
-### 7. **unified_ai_trading_platform.py** - Main Integration
+### 7. Platform Orchestration (via `main.py`)
 - Orchestrates all components
 - Scheduled task management
 - Market hours awareness
@@ -276,11 +274,11 @@ Each signal combines all 5 strategies with weighted scoring:
 - **`requirements.txt`**: Python package dependencies
 
 ### Log Files
-- **`unified_trading_platform.log`**: Main platform logs
+- **`trading_platform.log`**: Main platform logs
 - **`eod_report_YYYYMMDD.txt`**: Daily end-of-day reports
 
 ### Database
-- **`unified_trading.db`**: SQLite database with all data
+- **`trading_platform.db`**: SQLite database with all data
 - **Automatic Backups**: Database backed up during cleanup
 
 ## 🚨 Troubleshooting
@@ -320,7 +318,7 @@ pip install TA-Lib
 #### 4. Database Errors
 - Check file permissions in the directory
 - Ensure SQLite is available (built into Python)
-- Delete `unified_trading.db` to reset database
+- Delete `trading_platform.db` to reset database
 
 #### 5. Web Dashboard Issues
 - Check port 5000 is not in use
@@ -329,10 +327,10 @@ pip install TA-Lib
 - Use `127.0.0.1:5000` instead of `localhost:5000`
 
 ### Getting Help
-1. Check the log file: `unified_trading_platform.log`
-2. Run in test mode: `python unified_ai_trading_platform.py --test-mode`
-3. Check individual modules work: `python unified_live_data.py`
-4. Verify configuration: Review `unified_config.py` settings
+1. Check the log file: `trading_platform.log`
+2. Run in test mode: `python main.py --test`
+3. Check individual modules work: `python -m core.unified_live_data`
+4. Verify configuration: Review `core/unified_config.py` settings
 
 ## 🎯 Performance Tips
 

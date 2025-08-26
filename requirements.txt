@@ -1,48 +1,38 @@
-# UNIFIED AI TRADING PLATFORM - REQUIREMENTS
-# ==========================================
+# 🚀 AI Trading Bot - Clean Requirements
+# Core Dependencies for Unified AI Trading Platform
 
-# Core dependencies
+# Data Analysis & Scientific Computing
 pandas>=1.5.0
-numpy>=1.21.0
+numpy>=1.24.0
+scipy>=1.10.0
 
-# Data sources and APIs
-yfinance>=0.2.0
-requests>=2.28.0
-beautifulsoup4>=4.12.0
-lxml>=4.9.0
+# Technical Analysis
+TA-Lib>=0.4.25
+yfinance>=0.2.12
 
-# Technical analysis
-ta>=0.10.0
-
-# Web framework and dashboard
-Flask>=2.2.0
+# Web Framework & API
+Flask>=2.3.0
 Flask-SocketIO>=5.3.0
-eventlet>=0.33.0
+Flask-CORS>=4.0.0
 
-# Scheduling and async
+# Database
+sqlite3
+
+# HTTP Requests
+requests>=2.28.0
+aiohttp>=3.8.0
+
+# Configuration & Environment
+python-dotenv>=1.0.0
+
+# Logging & Utilities
 schedule>=1.2.0
-APScheduler>=3.10.0
+pytz>=2023.3
 
-# Utilities
-python-dotenv>=0.19.0
-python-dateutil>=2.8.0
-pytz>=2022.1
+# Optional: Enhanced Features
+# alpha_vantage>=2.3.1  # For backup data source
+# python-telegram-bot>=20.0  # For Telegram notifications
 
-# Telegram integration
-python-telegram-bot>=20.0
-
-# Basic charting and visualization
-plotly>=5.11.0
-matplotlib>=3.5.0
-
-# Machine learning
-scikit-learn>=1.1.0
-
-# Optional packages that may require manual installation:
-# TA-Lib (requires: pip install TA-Lib or download wheel from https://www.lfd.uci.edu/~gohlke/pythonlibs/#ta-lib)
-# mplfinance (requires: pip install mplfinance --pre)
-# alpha-vantage (only needed if you have API key)
-# seaborn (for advanced plotting)
-# colorlog (for colored logging)
-# pymongo (for MongoDB support)
-# aiohttp (for async HTTP)
+# Development & Testing (optional)
+# pytest>=7.0.0
+# pytest-asyncio>=0.21.0
