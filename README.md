@@ -1,6 +1,5 @@
 # Apex AI Trading Platform
 
-# Apex AI Trading Platform
 
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue) ![Status: Alpha](https://img.shields.io/badge/status-alpha-orange)
 
