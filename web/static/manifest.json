@@ -1,17 +1,19 @@
 {
-  "name": "AI Trading Bot",
-  "short_name": "AI Trader",
-  "description": "Advanced AI-powered trading bot with real-time monitoring",
+  "name": "Apex AI Trading Platform",
+  "short_name": "Apex AI",
+  "description": "Single-dashboard, Yahoo-only AI paper trading with realtime web UI",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#667eea",
-  "theme_color": "#2E8B57",
+  "background_color": "#0b0b0c",
+  "theme_color": "#0b0b0c",
   "orientation": "portrait-primary",
   "icons": [
     {
       "src": "icon-144.png",
       "sizes": "144x144",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
