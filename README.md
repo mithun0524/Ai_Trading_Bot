@@ -2,7 +2,7 @@
 
 # Apex AI Trading Platform
 
-![Python](https://img.shields.io/badge/python-3.10%2B-blue) ![License: MIT](https://img.shields.io/badge/license-MIT-green) ![Status: Alpha](https://img.shields.io/badge/status-alpha-orange)
+![Python](https://img.shields.io/badge/python-3.10%2B-blue) ![Status: Alpha](https://img.shields.io/badge/status-alpha-orange)
 
 Apex AI Trading Platform is a modern, single-dashboard paper trading solution that combines AI-driven signals, real-time market data, and easy local storage to help traders prototype, backtest, and iterate on strategies quickly and safely. It favors clarity, repeatability, and a minimal install footprint.
 
